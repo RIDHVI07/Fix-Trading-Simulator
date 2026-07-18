@@ -1,0 +1,25 @@
+# Maven
+target/
+*.class
+*.jar
+*.war
+
+# IDE — Eclipse
+.classpath
+.project
+.settings/
+bin/
+
+# IDE — IntelliJ
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# IDE — VSCode
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
