@@ -21,6 +21,7 @@
 
     <properties>
         <java.version>17</java.version>
+        <quickfixj.version>2.3.1</quickfixj.version>
     </properties>
 
     <dependencies>
@@ -29,6 +30,20 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- QuickFIX/J Core -->
+        <dependency>
+            <groupId>org.quickfixj</groupId>
+            <artifactId>quickfixj-core</artifactId>
+            <version>${quickfixj.version}</version>
+        </dependency>
+
+        <!-- QuickFIX/J FIX 4.4 Message Library -->
+        <dependency>
+            <groupId>org.quickfixj</groupId>
+            <artifactId>quickfixj-messages-fix44</artifactId>
+            <version>${quickfixj.version}</version>
         </dependency>
 
         <!-- Lombok -->

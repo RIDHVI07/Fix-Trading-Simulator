@@ -1,6 +1,7 @@
 package com.trading.simulator.service;
 
 import com.trading.simulator.dto.PlaceOrderRequest;
+import com.trading.simulator.fix.FixClient;
 import com.trading.simulator.model.Order;
 import com.trading.simulator.repository.OrderRepository;
 import org.slf4j.Logger;
@@ -21,16 +22,19 @@ public class OrderService {
     private static final Logger log = LoggerFactory.getLogger(OrderService.class);
 
     private final OrderRepository orderRepository;
+    private final FixClient       fixClient;
 
     @Autowired
-    public OrderService(OrderRepository orderRepository) {
+    public OrderService(OrderRepository orderRepository,
+                        FixClient fixClient) {
         this.orderRepository = orderRepository;
+        this.fixClient       = fixClient;
     }
 
     /**
      * Place a new order.
-     * Persists the order with PENDING status — routing to the exchange
-     * is added once the FIX session is in place.
+     * 1. Persists the order with PENDING status.
+     * 2. Sends a NewOrderSingle FIX message via FixClient.
      */
     public Order placeOrder(PlaceOrderRequest request) {
         validateRequest(request);
@@ -49,6 +53,8 @@ public class OrderService {
 
         orderRepository.save(order);
         log.info("Order saved — orderId={}, clOrdId={}", orderId, clOrdId);
+
+        fixClient.sendNewOrderSingle(order);
 
         return order;
     }
