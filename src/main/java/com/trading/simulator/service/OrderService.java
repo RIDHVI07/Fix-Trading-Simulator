@@ -3,18 +3,25 @@ package com.trading.simulator.service;
 import com.trading.simulator.dto.PlaceOrderRequest;
 import com.trading.simulator.fix.FixClient;
 import com.trading.simulator.model.Order;
+import com.trading.simulator.model.OrderStatus;
 import com.trading.simulator.repository.OrderRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 /**
  * Core order management service.
+ *
+ * NOTE: FixClient is injected @Lazy to break the circular dependency:
+ *   OrderService → FixClient → OrderService
+ * Spring resolves this by injecting a proxy on first use.
  */
 @Service
 public class OrderService {
@@ -22,11 +29,13 @@ public class OrderService {
     private static final Logger log = LoggerFactory.getLogger(OrderService.class);
 
     private final OrderRepository orderRepository;
-    private final FixClient       fixClient;
+
+    @Lazy
+    private final FixClient fixClient;
 
     @Autowired
     public OrderService(OrderRepository orderRepository,
-                        FixClient fixClient) {
+                        @Lazy FixClient fixClient) {
         this.orderRepository = orderRepository;
         this.fixClient       = fixClient;
     }
@@ -35,6 +44,7 @@ public class OrderService {
      * Place a new order.
      * 1. Persists the order with PENDING status.
      * 2. Sends a NewOrderSingle FIX message via FixClient.
+     * 3. The exchange will asynchronously send back ExecutionReports.
      */
     public Order placeOrder(PlaceOrderRequest request) {
         validateRequest(request);
@@ -75,6 +85,24 @@ public class OrderService {
             return orderRepository.findBySymbol(symbol);
         }
         return orderRepository.findAll();
+    }
+
+    // ---------- Called by FixClient when ExecutionReports arrive ----------
+
+    /**
+     * Update order status based on incoming FIX ExecutionReport.
+     */
+    public void updateOrderStatus(String clOrdId, OrderStatus newStatus,
+                                  int filledQty, BigDecimal avgFillPrice) {
+        orderRepository.findByClOrdId(clOrdId).ifPresentOrElse(order -> {
+            order.setStatus(newStatus);
+            order.setFilledQty(filledQty);
+            order.setAvgFillPrice(avgFillPrice);
+            order.setUpdatedAt(LocalDateTime.now());
+            orderRepository.save(order);
+            log.info("Order updated — clOrdId={}, status={}, filledQty={}",
+                    clOrdId, newStatus, filledQty);
+        }, () -> log.warn("Received ExecutionReport for unknown clOrdId={}", clOrdId));
     }
 
     // ---------- Validation ----------
