@@ -65,6 +65,18 @@ public class OrderController {
     }
 
     // ──────────────────────────────────────────────
+    //  DELETE /api/orders/{orderId} — cancel an order
+    // ──────────────────────────────────────────────
+
+    @DeleteMapping("/{orderId}")
+    public ResponseEntity<OrderResponse> cancelOrder(
+            @PathVariable String orderId) {
+
+        Order order = orderService.cancelOrder(orderId);
+        return ResponseEntity.ok(OrderResponse.from(order));
+    }
+
+    // ──────────────────────────────────────────────
     //  Exception handling
     // ──────────────────────────────────────────────
 

@@ -70,6 +70,26 @@ public class OrderService {
     }
 
     /**
+     * Cancel an existing order.
+     * Sends an OrderCancelRequest FIX message.
+     */
+    public Order cancelOrder(String orderId) {
+        Order order = orderRepository.findByOrderId(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found: " + orderId));
+
+        if (order.getStatus() == OrderStatus.FILLED
+                || order.getStatus() == OrderStatus.CANCELLED
+                || order.getStatus() == OrderStatus.REJECTED) {
+            throw new IllegalStateException(
+                    "Cannot cancel order in status: " + order.getStatus());
+        }
+
+        fixClient.sendOrderCancelRequest(order);
+        log.info("Cancel request sent for orderId={}", orderId);
+        return order;
+    }
+
+    /**
      * Get a single order by ID.
      */
     public Order getOrder(String orderId) {
