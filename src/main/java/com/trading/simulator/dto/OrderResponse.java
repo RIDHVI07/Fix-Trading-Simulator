@@ -4,10 +4,12 @@ import com.trading.simulator.model.Order;
 import com.trading.simulator.model.OrderSide;
 import com.trading.simulator.model.OrderStatus;
 import com.trading.simulator.model.OrderType;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+@Schema(description = "Order details returned by the API")
 public class OrderResponse {
 
     private String orderId;
