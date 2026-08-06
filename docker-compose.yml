@@ -1,0 +1,26 @@
+version: "3.9"
+
+services:
+
+  fix-trading-simulator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fix-trading-simulator
+    ports:
+      - "8080:8080"   # REST API + Swagger UI
+      - "9878:9878"   # FIX 4.4 session port
+    environment:
+      # Both the acceptor and initiator run inside the same container,
+      # so the initiator connects to localhost within the container.
+      - fix.initiator.host=localhost
+      - fix.acceptor.port=9878
+      - fix.fill.delay.seconds=2
+      - SPRING_PROFILES_ACTIVE=default
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped

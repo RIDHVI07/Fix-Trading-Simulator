@@ -20,6 +20,14 @@ out/
 # IDE — VSCode
 .vscode/
 
+# Spring Boot
+*.log
+logs/
+store/
+
 # OS
 .DS_Store
 Thumbs.db
+
+# Docker
+.dockerignore
