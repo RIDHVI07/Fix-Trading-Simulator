@@ -1,5 +1,6 @@
 # FIX Protocol Trading Simulator
 
+[![Build](https://github.com/RIDHVI07/Fix-Trading-Simulator/actions/workflows/ci.yml/badge.svg)](https://github.com/RIDHVI07/Fix-Trading-Simulator/actions/workflows/ci.yml)
 [![Java](https://img.shields.io/badge/Java-17-ED8B00?style=flat-square&logo=openjdk&logoColor=white)](https://openjdk.org/projects/jdk/17/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.5-6DB33F?style=flat-square&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
 [![QuickFIX/J](https://img.shields.io/badge/QuickFIX%2FJ-2.3.1-blueviolet?style=flat-square)](http://www.quickfixj.org/)
@@ -82,7 +83,7 @@ Submit orders via REST API → they are routed over a live FIX 4.4 session to a 
 | **REST API** | 4 endpoints with full Swagger/OpenAPI documentation |
 | **In-memory Order Book** | Thread-safe `ConcurrentHashMap` with dual indexing |
 | **Docker** | Multi-stage build, single `docker-compose up` to run |
-| **Tests** | 30+ unit tests — repository, service, controller layers |
+| **Tests** | 37 tests — repository, service, controller and integration layers |
 | **Actuator** | `/actuator/health`, `/actuator/metrics` endpoints |
 
 ---
@@ -323,9 +324,10 @@ mvn verify
 | Layer | Test Class | Tests |
 |---|---|---|
 | Repository | `OrderRepositoryTest` | 10 tests |
-| Service | `OrderServiceTest` | 14 tests |
+| Service | `OrderServiceTest` | 16 tests |
 | Controller | `OrderControllerTest` | 10 tests |
 | Integration | `TradingSimulatorApplicationTests` | 1 test |
+| **Total** | | **37 tests** |
 
 ---
 
