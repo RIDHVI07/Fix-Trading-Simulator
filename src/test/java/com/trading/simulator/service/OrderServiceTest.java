@@ -46,8 +46,11 @@ class OrderServiceTest {
         limitBuyRequest.setQuantity(100);
         limitBuyRequest.setPrice(BigDecimal.valueOf(150.00));
 
-        // Make repository.save() return the order it receives
-        when(orderRepository.save(any(Order.class))).thenAnswer(inv -> inv.getArgument(0));
+        // Make repository.save() return the order it receives.
+        // lenient() because only the tests that exercise a save path consume
+        // this stub, and MockitoExtension defaults to strict stubbing.
+        lenient().when(orderRepository.save(any(Order.class)))
+                 .thenAnswer(inv -> inv.getArgument(0));
     }
 
     // ──────────────────────────────────────────────
