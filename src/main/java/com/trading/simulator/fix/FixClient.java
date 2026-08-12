@@ -20,8 +20,6 @@ import quickfix.fix44.OrderCancelRequest;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
 
 /**
  * FIX 4.4 initiator (CLIENT side).
@@ -145,7 +143,7 @@ public class FixClient implements Application {
             NewOrderSingle nos = new NewOrderSingle(
                     new ClOrdID(order.getClOrdId()),
                     new Side(sideChar),
-                    new TransactTime(toDate(LocalDateTime.now())),
+                    new TransactTime(LocalDateTime.now()),
                     new OrdType(typeChar)
             );
 
@@ -181,10 +179,10 @@ public class FixClient implements Application {
             OrderCancelRequest ocr = new OrderCancelRequest(
                     new OrigClOrdID(order.getClOrdId()),
                     new ClOrdID("CXLREQ-" + System.currentTimeMillis()),
-                    new Symbol(order.getSymbol()),
                     new Side(sideChar),
-                    new TransactTime(toDate(LocalDateTime.now()))
+                    new TransactTime(LocalDateTime.now())
             );
+            ocr.set(new Symbol(order.getSymbol()));
             ocr.set(new OrderQty(order.getQuantity()));
 
             Session.sendToTarget(ocr, sessionID);
@@ -230,17 +228,13 @@ public class FixClient implements Application {
             case OrdStatus.NEW              -> OrderStatus.NEW;
             case OrdStatus.PARTIALLY_FILLED -> OrderStatus.PARTIALLY_FILLED;
             case OrdStatus.FILLED           -> OrderStatus.FILLED;
-            case OrdStatus.CANCELLED        -> OrderStatus.CANCELLED;
+            case OrdStatus.CANCELED         -> OrderStatus.CANCELLED;
             case OrdStatus.REJECTED         -> OrderStatus.REJECTED;
             default -> {
                 log.warn("Unknown OrdStatus char: {}", qfjStatus);
                 yield OrderStatus.NEW;
             }
         };
-    }
-
-    private Date toDate(LocalDateTime ldt) {
-        return Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
     }
 
     private SessionSettings buildInitiatorSettings() throws ConfigError {

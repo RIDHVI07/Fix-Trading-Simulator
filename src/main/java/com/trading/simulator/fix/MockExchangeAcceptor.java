@@ -154,7 +154,7 @@ public class MockExchangeAcceptor implements Application {
 
         // Acknowledge cancellation immediately
         sendExecutionReport(origClOrdId, symbol, side, qty, 0,
-                OrdStatus.CANCELLED, ExecType.CANCELED, 0.0, sessionID);
+                OrdStatus.CANCELED, ExecType.CANCELED, 0.0, sessionID);
     }
 
     // ──────────────────────────────────────────────
